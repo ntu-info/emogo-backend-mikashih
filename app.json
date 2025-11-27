@@ -1,49 +1,39 @@
 {
   "expo": {
+    "scheme": "acme",
+    "version": "1.0.1",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to record video.",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone to record audio."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
+    ],
     "name": "expo-router-mwe",
     "slug": "my-app-1",
-    "owner": "mikashih0911",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "scheme": "acme",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "plugins": [
-      "expo-router"
-    ],
     "android": {
-      "package": "com.spiketren.exporoutermwe",
-      "versionCode": 1
-    },
-    "ios": {
-      "bundleIdentifier": "com.spiketren.exporoutermwe",
-      "buildNumber": "1",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.spiketren.exporoutermwe"
     },
     "extra": {
       "router": {},
       "eas": {
         "projectId": "684f33f2-f691-49c2-a0cf-aa12ded44b34"
+      }
+    },
+    "owner": "mikashih0911",
+    "ios": {
+      "bundleIdentifier": "com.spiketren.exporoutermwe",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     }
   }

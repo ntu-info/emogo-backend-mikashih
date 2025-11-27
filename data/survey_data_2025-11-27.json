@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1764205218710",
+    "timestamp": "2025-11-27T01:00:18.710Z",
+    "mood": 5,
+    "location": {
+      "latitude": 37.4219983,
+      "longitude": -122.084,
+      "timestamp": 1764318913504
+    },
+    "hasVideo": true,
+    "videoUri": "file:///data/user/0/com.spiketren.exporoutermwe/files/videos/video_1764205218693.mp4"
+  },
+  {
+    "id": "1764230422886",
+    "timestamp": "2025-11-27T08:00:22.886Z",
+    "mood": 4,
+    "location": {
+      "latitude": 37.4219983,
+      "longitude": -122.084,
+      "timestamp": 1764318913504
+    },
+    "hasVideo": true,
+    "videoUri": "file:///data/user/0/com.spiketren.exporoutermwe/files/videos/video_1764230422884.mp4"
+  },
+  {
+    "id": "1764252044309",
+    "timestamp": "2025-11-27T14:00:44.309Z",
+    "mood": 4,
+    "location": {
+      "latitude": 37.4219983,
+      "longitude": -122.084,
+      "timestamp": 1764318913504
+    },
+    "hasVideo": true,
+    "videoUri": "file:///data/user/0/com.spiketren.exporoutermwe/files/videos/video_1764252044306.mp4"
+  }
+]

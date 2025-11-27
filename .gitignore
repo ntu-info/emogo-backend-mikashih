@@ -6,10 +6,6 @@ node_modules/
 dist/
 web-build/
 
-# Native 原生專案（由 Expo 產生）
-android/
-ios/
-
 # IDE
 .idea/
 .vscode/

@@ -1,1 +1,29 @@
-node_modules
+# 依賴套件
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native 原生專案（由 Expo 產生）
+android/
+ios/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 系統檔案
+.DS_Store
+*.log
+
+# 測試資料
+data/
+
+# 環境變數
+.env
+.env.local
+.env.*.local

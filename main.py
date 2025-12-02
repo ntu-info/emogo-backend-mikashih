@@ -111,7 +111,7 @@ class SurveyData(BaseModel):
     location: Optional[Location] = None
     hasVideo: bool = False
     videoUri: Optional[str] = None
-    videoBase64: Optional[str] = None  # Base64 編碼的影片資料
+    videoBase64: Optional[str] = None  # Base64 編碼的影片資料（用於上傳）
 
 
 class SurveyResponse(BaseModel):
@@ -119,8 +119,8 @@ class SurveyResponse(BaseModel):
     mood: int
     location: Optional[Location]
     hasVideo: bool
-    videoUri: Optional[str]
-    hasVideoData: bool = False  # 是否有影片資料存在 MongoDB
+    videoUri: Optional[str] = None       # 本地影片路徑
+    videoUrl: Optional[str] = None       # 影片下載網址
     timestamp: str
 
     class Config:
@@ -162,7 +162,7 @@ async def create_survey(survey: SurveyData):
         "location": survey.location.dict() if survey.location else None,
         "hasVideo": survey.hasVideo,
         "videoUri": survey.videoUri,
-        "videoBase64": survey.videoBase64,  # 儲存 Base64 影片到 MongoDB
+        "videoBase64": survey.videoBase64,  # 暫存 Base64（用於生成下載連結）
         "timestamp": datetime.now().isoformat()
     }
     
@@ -172,32 +172,46 @@ async def create_survey(survey: SurveyData):
         print(f"📹 收到影片，大小約 {video_size_kb:.1f} KB")
     
     result = await db.surveys.insert_one(survey_dict)
+    survey_id = str(result.inserted_id)
+    
+    # 生成影片下載網址
+    video_url = None
+    if survey.videoBase64:
+        video_url = f"/api/surveys/{survey_id}/video/download"
     
     return {
-        "id": str(result.inserted_id),
+        "id": survey_id,
         "mood": survey_dict["mood"],
         "location": survey_dict["location"],
         "hasVideo": survey_dict["hasVideo"],
         "videoUri": survey_dict["videoUri"],
-        "hasVideoData": survey.videoBase64 is not None,
+        "videoUrl": video_url,
         "timestamp": survey_dict["timestamp"]
     }
 
 
 @app.get("/api/surveys", response_model=List[SurveyResponse])
 async def get_surveys():
-    """取得所有心情記錄（不含影片資料）"""
+    """取得所有心情記錄（含影片下載網址）"""
     surveys = []
     cursor = db.surveys.find().sort("timestamp", -1)  # 按時間降序
     
     async for survey in cursor:
+        survey_id = str(survey["_id"])
+        has_video_data = survey.get("videoBase64") is not None
+        
+        # 生成影片下載網址
+        video_url = None
+        if has_video_data:
+            video_url = f"/api/surveys/{survey_id}/video/download"
+        
         surveys.append({
-            "id": str(survey["_id"]),
+            "id": survey_id,
             "mood": survey["mood"],
             "location": survey.get("location"),
             "hasVideo": survey.get("hasVideo", False),
             "videoUri": survey.get("videoUri"),
-            "hasVideoData": survey.get("videoBase64") is not None,
+            "videoUrl": video_url,
             "timestamp": survey["timestamp"]
         })
     
@@ -268,9 +282,18 @@ async def get_survey(survey_id: str):
     if not survey:
         raise HTTPException(status_code=404, detail="找不到該記錄")
     
-    survey["id"] = str(survey["_id"])
-    del survey["_id"]
-    return survey
+    has_video_data = survey.get("videoBase64") is not None
+    video_url = f"/api/surveys/{survey_id}/video/download" if has_video_data else None
+    
+    return {
+        "id": survey_id,
+        "mood": survey["mood"],
+        "location": survey.get("location"),
+        "hasVideo": survey.get("hasVideo", False),
+        "videoUri": survey.get("videoUri"),
+        "videoUrl": video_url,
+        "timestamp": survey["timestamp"]
+    }
 
 
 @app.delete("/api/surveys/{survey_id}")

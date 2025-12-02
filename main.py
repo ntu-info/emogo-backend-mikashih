@@ -207,7 +207,7 @@ async def get_surveys():
 # 取得單筆記錄的影片資料
 @app.get("/api/surveys/{survey_id}/video")
 async def get_survey_video(survey_id: str):
-    """取得單筆心情記錄的影片（Base64）"""
+    """取得單筆心情記錄的影片（Base64 JSON）"""
     if not ObjectId.is_valid(survey_id):
         raise HTTPException(status_code=400, detail="無效的記錄 ID")
     
@@ -224,6 +224,37 @@ async def get_survey_video(survey_id: str):
         "videoBase64": survey["videoBase64"],
         "hasVideo": True
     }
+
+
+# 直接下載影片檔案
+@app.get("/api/surveys/{survey_id}/video/download")
+async def download_survey_video(survey_id: str):
+    """直接下載影片檔案（.mp4）"""
+    from fastapi.responses import Response
+    import base64
+    
+    if not ObjectId.is_valid(survey_id):
+        raise HTTPException(status_code=400, detail="無效的記錄 ID")
+    
+    survey = await db.surveys.find_one({"_id": ObjectId(survey_id)})
+    
+    if not survey:
+        raise HTTPException(status_code=404, detail="找不到該記錄")
+    
+    if not survey.get("videoBase64"):
+        raise HTTPException(status_code=404, detail="該記錄沒有影片")
+    
+    # 解碼 Base64 為二進位
+    video_bytes = base64.b64decode(survey["videoBase64"])
+    
+    # 回傳影片檔案
+    return Response(
+        content=video_bytes,
+        media_type="video/mp4",
+        headers={
+            "Content-Disposition": f"attachment; filename=mood_video_{survey_id}.mp4"
+        }
+    )
 
 
 @app.get("/api/surveys/{survey_id}", response_model=SurveyResponse)

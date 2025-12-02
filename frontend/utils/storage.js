@@ -9,8 +9,8 @@ const VIDEO_DIRECTORY = `${FileSystem.documentDirectory}videos/`;
 // ========== Backend API Configuration ==========
 // 後端 API 網址（本地開發或正式環境）
 const API_BASE_URL = __DEV__ 
-  ? 'http://192.168.50.90:8000'  // 本地開發（改成你的電腦 IP）
-  : 'https://your-render-app.onrender.com';  // 正式環境（部署後更新）
+  ? 'http://192.168.50.90:8000'  // 本地開發
+  : 'https://emogo-backend-mikashih.onrender.com';  // Render 正式環境
 
 // ========== Backend API Functions ==========
 

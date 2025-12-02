@@ -24,7 +24,7 @@
 
 | 資料類型 | API 端點 | 說明 |
 |----------|----------|------|
-| **📊 所有記錄 (JSON)** | [GET /api/surveys](ㄎ) | 包含心情、GPS、影片狀態 |
+| **📊 所有記錄 (JSON)** | [GET /api/surveys](https://emogo-backend-mikashih.onrender.com/api/surveys) | 包含心情、GPS、影片網址 |
 | **📈 統計資料** | [GET /api/stats](https://emogo-backend-mikashih.onrender.com/api/stats) | 心情分布、記錄總數 |
 | **📄 API 文件** | [Swagger UI](https://emogo-backend-mikashih.onrender.com/docs) | 互動式 API 測試介面 |
 
@@ -39,8 +39,7 @@ https://emogo-backend-mikashih.onrender.com/api/surveys/{id}/video/download
 **目前可下載的影片：**
 | 記錄 ID | 心情 | GPS 座標 | 下載連結 |
 |---------|------|----------|----------|
-| `692edeae45f9d981f0700b2e` | 😞 (2) | 37.4220, -122.0840 | [下載影片](https://emogo-backend-mikashih.onrender.com/api/surveys/692edeae45f9d981f0700b2e/video/download) |
-| `692ed851550905157408d15e` | 😊 (4) | 37.4220, -122.0840 | [下載影片](https://emogo-backend-mikashih.onrender.com/api/surveys/692ed851550905157408d15e/video/download) |
+| `692eea74a61d2cb03946d3e0` | 😄 (5) | 37.4220, -122.0840 | [下載影片](https://emogo-backend-mikashih.onrender.com/api/surveys/692eea74a61d2cb03946d3e0/video/download) |
 
 ### 📊 資料格式範例
 
@@ -48,18 +47,28 @@ https://emogo-backend-mikashih.onrender.com/api/surveys/{id}/video/download
 ```json
 [
   {
-    "id": "692ed851550905157408d15e",
-    "mood": 4,                                              // 心情分數 1-5 (Sentiment)
-    "location": {                                           // GPS 座標
+    "id": "692eea74a61d2cb03946d3e0",
+    "mood": 5,
+    "location": {
       "latitude": 37.4219983,
       "longitude": -122.084
     },
-    "hasVideo": true,                                       // 是否有影片 (Vlog)
-    "videoUrl": "/api/surveys/692ed851.../video/download",  // 影片下載網址
-    "timestamp": "2025-12-02T20:15:13"                      // 記錄時間
+    "hasVideo": true,
+    "videoUrl": "/api/surveys/692eea74a61d2cb03946d3e0/video/download",
+    "timestamp": "2025-12-02T13:32:36.440262"
   }
 ]
 ```
+
+**欄位說明：**
+| 欄位 | 類型 | 說明 |
+|------|------|------|
+| `id` | string | MongoDB 記錄 ID |
+| `mood` | int | 心情分數 1-5 (Sentiment) |
+| `location` | object | GPS 座標 (latitude, longitude) |
+| `hasVideo` | bool | 是否有影片 |
+| `videoUrl` | string | 影片下載網址（可直接下載 .mp4） |
+| `timestamp` | string | 記錄時間 (ISO 8601) |
 
 ### 🛠 使用 cURL 下載資料
 

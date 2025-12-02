@@ -24,7 +24,7 @@
 
 | 資料類型 | API 端點 | 說明 |
 |----------|----------|------|
-| **📊 所有記錄 (JSON)** | [GET /api/surveys](https://emogo-backend-mikashih.onrender.com/api/surveys) | 包含心情、GPS、影片狀態 |
+| **📊 所有記錄 (JSON)** | [GET /api/surveys](ㄎ) | 包含心情、GPS、影片狀態 |
 | **📈 統計資料** | [GET /api/stats](https://emogo-backend-mikashih.onrender.com/api/stats) | 心情分布、記錄總數 |
 | **📄 API 文件** | [Swagger UI](https://emogo-backend-mikashih.onrender.com/docs) | 互動式 API 測試介面 |
 

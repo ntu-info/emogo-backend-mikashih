@@ -119,7 +119,6 @@ class SurveyResponse(BaseModel):
     mood: int
     location: Optional[Location]
     hasVideo: bool
-    videoUri: Optional[str] = None       # 本地影片路徑
     videoUrl: Optional[str] = None       # 影片下載網址
     timestamp: str
 
@@ -191,7 +190,6 @@ async def create_survey(survey: SurveyData):
         "mood": survey_dict["mood"],
         "location": survey_dict["location"],
         "hasVideo": survey_dict["hasVideo"],
-        "videoUri": survey_dict["videoUri"],
         "videoUrl": video_url,
         "timestamp": survey_dict["timestamp"]
     }
@@ -217,7 +215,6 @@ async def get_surveys():
             "mood": survey["mood"],
             "location": survey.get("location"),
             "hasVideo": survey.get("hasVideo", False),
-            "videoUri": survey.get("videoUri"),
             "videoUrl": video_url,
             "timestamp": survey["timestamp"]
         })
@@ -297,7 +294,6 @@ async def get_survey(survey_id: str):
         "mood": survey["mood"],
         "location": survey.get("location"),
         "hasVideo": survey.get("hasVideo", False),
-        "videoUri": survey.get("videoUri"),
         "videoUrl": video_url,
         "timestamp": survey["timestamp"]
     }

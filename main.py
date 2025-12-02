@@ -157,12 +157,14 @@ async def health_check():
 @app.post("/api/surveys", response_model=SurveyResponse)
 async def create_survey(survey: SurveyData):
     """建立新的心情記錄"""
+    # 先建立基本資料（不含 videoUrl，因為還沒有 ID）
     survey_dict = {
         "mood": survey.mood,
         "location": survey.location.dict() if survey.location else None,
         "hasVideo": survey.hasVideo,
         "videoUri": survey.videoUri,
-        "videoBase64": survey.videoBase64,  # 暫存 Base64（用於生成下載連結）
+        "videoBase64": survey.videoBase64,
+        "videoUrl": None,  # 先設為 None，等拿到 ID 再更新
         "timestamp": datetime.now().isoformat()
     }
     
@@ -174,10 +176,15 @@ async def create_survey(survey: SurveyData):
     result = await db.surveys.insert_one(survey_dict)
     survey_id = str(result.inserted_id)
     
-    # 生成影片下載網址
+    # 生成影片下載網址並更新到資料庫
     video_url = None
     if survey.videoBase64:
         video_url = f"/api/surveys/{survey_id}/video/download"
+        # 更新資料庫中的 videoUrl 欄位
+        await db.surveys.update_one(
+            {"_id": result.inserted_id},
+            {"$set": {"videoUrl": video_url}}
+        )
     
     return {
         "id": survey_id,

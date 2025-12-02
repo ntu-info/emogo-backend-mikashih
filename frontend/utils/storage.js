@@ -7,10 +7,8 @@ const NOTIFICATION_SETTINGS_KEY = '@notification_settings';
 const VIDEO_DIRECTORY = `${FileSystem.documentDirectory}videos/`;
 
 // ========== Backend API Configuration ==========
-// 後端 API 網址（本地開發或正式環境）
-const API_BASE_URL = __DEV__ 
-  ? 'http://192.168.50.90:8000'  // 本地開發
-  : 'https://emogo-backend-mikashih.onrender.com';  // Render 正式環境
+// 後端 API 網址（統一使用 Render 正式環境）
+const API_BASE_URL = 'https://emogo-backend-mikashih.onrender.com';
 
 // ========== Backend API Functions ==========
 

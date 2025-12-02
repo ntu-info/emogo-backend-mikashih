@@ -1,5 +1,5 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/1M59WghA)
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=21801936&assignment_repo_type=AssignmentRepo)
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/e7FBMwSa)
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=21880357&assignment_repo_type=AssignmentRepo)
 
 # 📱 EmoGo - 心情記錄 App
 
@@ -7,14 +7,13 @@
 
 ---
 
-## 🔗 App 連結
+## 🔗 連結
 
 | 項目 | 連結 |
 |------|------|
 | **Expo 專案頁面** | [https://expo.dev/@mikashih0911/my-app-1](https://expo.dev/@mikashih0911/my-app-1) |
-| **專案 ID** | `684f33f2-f691-49c2-a0cf-aa12ded44b34` |
-| **Development Build URI** | `exp+my-app-1://expo-development-client` |
 | **Android APK 下載** | [EAS Build 頁面](https://expo.dev/accounts/mikashih0911/projects/my-app-1/builds/21918372-42a3-499a-b221-57127087f467) |
+| **Backend API 文件** | 部署後訪問 `/docs` |
 
 ---
 
@@ -48,6 +47,17 @@
 
 ## 🛠 技術架構
 
+### Backend (Python / FastAPI) - 本 Repo
+
+| 技術 | 說明 |
+|------|------|
+| **FastAPI** | 現代化 Python Web 框架 |
+| **Uvicorn** | ASGI 伺服器 |
+| **Pydantic** | 資料驗證 |
+| **Render** | 雲端部署平台 |
+
+### Frontend (React Native / Expo) - frontend/ 目錄
+
 | 技術 | 說明 |
 |------|------|
 | **Expo SDK 54** | React Native 開發框架 |
@@ -64,23 +74,30 @@
 ## 📁 專案結構
 
 ```
-emogo-frontend-mikashih-main/
-├── app/
-│   ├── (tabs)/
-│   │   ├── _layout.js      # Tab 導航配置
-│   │   ├── index.js        # 首頁 (心情記錄)
-│   │   └── settings.js     # 設定頁面
-│   ├── components/
-│   │   └── SurveyScreen.js # 問卷表單元件
-│   ├── _layout.js          # 根 Layout
-│   ├── details.js          # 詳情頁
-│   └── index.js            # 入口頁
-├── utils/
-│   ├── storage.js          # 資料儲存工具
-│   └── notifications.js    # 通知排程工具
-├── app.json                # Expo 配置
-├── eas.json                # EAS Build 配置
-└── package.json            # 依賴套件
+emogo-backend-mikashih/
+├── main.py                      # Backend API 主程式
+├── requirements.txt             # Python 依賴
+├── render.yaml                  # Render 部署設定
+│
+├── frontend/                    # 前端 App (React Native)
+│   ├── app/
+│   │   ├── (tabs)/
+│   │   │   ├── _layout.js      # Tab 導航配置
+│   │   │   ├── index.js        # 首頁 (心情記錄)
+│   │   │   └── settings.js     # 設定頁面
+│   │   ├── components/
+│   │   │   └── SurveyScreen.js # 問卷表單元件
+│   │   └── _layout.js          # 根 Layout
+│   ├── utils/
+│   │   ├── storage.js          # 資料儲存工具
+│   │   └── notifications.js    # 通知排程工具
+│   ├── android/                # Android 原生專案
+│   ├── ios/                    # iOS 原生專案
+│   ├── app.json                # Expo 配置
+│   ├── eas.json                # EAS Build 配置
+│   └── package.json            # 依賴套件
+│
+└── README.md                   # 專案說明文件
 ```
 
 ---
@@ -88,17 +105,32 @@ emogo-frontend-mikashih-main/
 ## 🚀 快速開始
 
 ### 環境需求
-- Node.js 18+
-- npm 或 yarn
-- Expo CLI
-- EAS CLI (用於雲端建置)
+- Python 3.9+
+- Node.js 18+ (前端)
+- Expo CLI (前端)
 
-### 安裝步驟
+### Backend 啟動
 
 ```bash
 # 1. Clone 專案
-git clone https://github.com/ntu-info/emogo-frontend-mikashih.git
-cd emogo-frontend-mikashih
+git clone https://github.com/ntu-info/emogo-backend-mikashih.git
+cd emogo-backend-mikashih
+
+# 2. 安裝 Python 依賴
+pip install -r requirements.txt
+
+# 3. 啟動 API 伺服器
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+# 4. 查看 API 文件
+# 開啟瀏覽器訪問 http://localhost:8000/docs
+```
+
+### Frontend 啟動
+
+```bash
+# 1. 進入 frontend 目錄
+cd frontend
 
 # 2. 安裝依賴
 npm install
@@ -111,18 +143,33 @@ npx expo start
 # 按 i 開啟 iOS
 ```
 
-### 建置 APK
+### 部署到 Render
 
-```bash
-# 登入 EAS
-eas login
+1. Fork 此 repo 或連接 GitHub
+2. 在 Render 建立新的 Web Service
+3. 選擇此 repo
+4. Render 會自動偵測 `render.yaml` 設定
+5. 點擊 Deploy
 
-# 建置 Android Preview 版本
-eas build --platform android --profile preview
+或點擊下方按鈕一鍵部署：
 
-# 建置 Production 版本
-eas build --platform android --profile production
-```
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy)
+
+---
+
+## 📡 API 端點
+
+| 方法 | 路徑 | 說明 |
+|------|------|------|
+| GET | `/` | API 首頁 |
+| GET | `/health` | 健康檢查 |
+| POST | `/api/surveys` | 建立心情記錄 |
+| GET | `/api/surveys` | 取得所有記錄 |
+| GET | `/api/surveys/{id}` | 取得單筆記錄 |
+| DELETE | `/api/surveys/{id}` | 刪除單筆記錄 |
+| DELETE | `/api/surveys` | 清除所有記錄 |
+| POST | `/api/upload/video` | 上傳影片 |
+| GET | `/api/stats` | 取得統計資料 |
 
 ---
 

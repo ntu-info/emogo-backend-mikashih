@@ -6,6 +6,127 @@ const SURVEY_DATA_KEY = '@survey_data';
 const NOTIFICATION_SETTINGS_KEY = '@notification_settings';
 const VIDEO_DIRECTORY = `${FileSystem.documentDirectory}videos/`;
 
+// ========== Backend API Configuration ==========
+// 後端 API 網址（本地開發或正式環境）
+const API_BASE_URL = __DEV__ 
+  ? 'http://192.168.50.90:8000'  // 本地開發（改成你的電腦 IP）
+  : 'https://your-render-app.onrender.com';  // 正式環境（部署後更新）
+
+// ========== Backend API Functions ==========
+
+// 將影片檔案轉成 Base64
+async function videoToBase64(videoUri) {
+  try {
+    if (!videoUri) return null;
+    
+    // 讀取影片檔案為 Base64
+    const base64 = await FileSystem.readAsStringAsync(videoUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+    
+    console.log('📹 影片轉換完成，Base64 長度:', base64.length);
+    return base64;
+  } catch (error) {
+    console.error('影片轉換 Base64 失敗:', error);
+    return null;
+  }
+}
+
+// 同步資料到後端
+async function syncToBackend(surveyData) {
+  try {
+    // 如果有影片，轉成 Base64
+    let videoBase64 = null;
+    if (surveyData.hasVideo && surveyData.videoUri) {
+      console.log('📤 正在轉換影片...');
+      videoBase64 = await videoToBase64(surveyData.videoUri);
+    }
+    
+    // 準備要傳送的資料
+    const payload = {
+      mood: surveyData.mood,
+      location: surveyData.location ? {
+        latitude: surveyData.location.latitude,
+        longitude: surveyData.location.longitude,
+      } : null,
+      hasVideo: surveyData.hasVideo || false,
+      videoUri: surveyData.videoUri || null,
+      videoBase64: videoBase64,  // Base64 影片資料
+    };
+    
+    console.log('📤 同步到後端 (影片大小:', videoBase64 ? `${(videoBase64.length / 1024).toFixed(1)} KB` : '無', ')');
+    
+    const response = await fetch(`${API_BASE_URL}/api/surveys`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ 資料已同步到後端:', result.id, '影片已上傳:', result.hasVideoData);
+      return result;
+    } else {
+      const errorText = await response.text();
+      console.warn('⚠️ 後端同步失敗:', response.status, errorText);
+      return null;
+    }
+  } catch (error) {
+    console.warn('⚠️ 無法連接後端 (離線模式):', error.message);
+    return null;
+  }
+}
+
+// 從後端刪除資料
+async function deleteFromBackend(backendId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/surveys/${backendId}`, {
+      method: 'DELETE',
+    });
+    
+    if (response.ok) {
+      console.log('✅ 後端資料已刪除:', backendId);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.warn('⚠️ 無法連接後端:', error.message);
+    return false;
+  }
+}
+
+// 取得後端所有資料
+export async function fetchFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/surveys`);
+    if (response.ok) {
+      const data = await response.json();
+      console.log('✅ 從後端取得', data.length, '筆資料');
+      return data;
+    }
+    return [];
+  } catch (error) {
+    console.warn('⚠️ 無法連接後端:', error.message);
+    return [];
+  }
+}
+
+// 取得後端統計資料
+export async function fetchStatsFromBackend() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/stats`);
+    if (response.ok) {
+      return await response.json();
+    }
+    return null;
+  } catch (error) {
+    console.warn('⚠️ 無法取得統計資料:', error.message);
+    return null;
+  }
+}
+
 // ========== Video Storage Functions ==========
 
 // 確保影片目錄存在
@@ -55,7 +176,7 @@ export async function deleteVideoFile(videoUri) {
 
 // ========== Survey Data Functions ==========
 
-// 儲存一筆問卷資料
+// 儲存一筆問卷資料（同時同步到後端）
 export async function saveSurveyData(data) {
   try {
     const existingData = await getSurveyData();
@@ -64,6 +185,13 @@ export async function saveSurveyData(data) {
       timestamp: new Date().toISOString(),
       ...data,
     };
+    
+    // 同步到後端
+    const backendResult = await syncToBackend(newEntry);
+    if (backendResult) {
+      newEntry.backendId = backendResult.id;  // 儲存後端 ID
+    }
+    
     const updatedData = [...existingData, newEntry];
     await AsyncStorage.setItem(SURVEY_DATA_KEY, JSON.stringify(updatedData));
     return newEntry;
@@ -84,7 +212,7 @@ export async function getSurveyData() {
   }
 }
 
-// 刪除單筆問卷資料（同時刪除相關影片）
+// 刪除單筆問卷資料（同時刪除相關影片和後端資料）
 export async function deleteSurveyData(id) {
   try {
     const existingData = await getSurveyData();
@@ -93,6 +221,11 @@ export async function deleteSurveyData(id) {
     // 如果有影片，先刪除影片檔案
     if (itemToDelete && itemToDelete.videoUri) {
       await deleteVideoFile(itemToDelete.videoUri);
+    }
+    
+    // 如果有後端 ID，也從後端刪除
+    if (itemToDelete && itemToDelete.backendId) {
+      await deleteFromBackend(itemToDelete.backendId);
     }
     
     const updatedData = existingData.filter(item => item.id !== id);
@@ -104,7 +237,7 @@ export async function deleteSurveyData(id) {
   }
 }
 
-// 刪除所有問卷資料（同時刪除所有影片）
+// 刪除所有問卷資料（同時刪除所有影片和後端資料）
 export async function clearAllSurveyData() {
   try {
     // 先取得所有資料，刪除所有影片
@@ -112,6 +245,10 @@ export async function clearAllSurveyData() {
     for (const item of existingData) {
       if (item.videoUri) {
         await deleteVideoFile(item.videoUri);
+      }
+      // 從後端刪除
+      if (item.backendId) {
+        await deleteFromBackend(item.backendId);
       }
     }
     

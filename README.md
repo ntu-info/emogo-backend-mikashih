@@ -43,7 +43,7 @@ https://emogo-backend-mikashih.onrender.com/api/surveys/{id}/video/download
 
 ### 📊 資料格式範例
 
-**GET /api/surveys 回傳格式：**
+**GET /api/surveys 回傳格式（API Response）：**
 ```json
 [
   {
@@ -60,13 +60,32 @@ https://emogo-backend-mikashih.onrender.com/api/surveys/{id}/video/download
 ]
 ```
 
-**欄位說明：**
+**MongoDB 資料庫儲存格式：**
+```json
+{
+  "_id": "692eea74a61d2cb03946d3e0",
+  "mood": 5,
+  "location": {
+    "latitude": 37.4219983,
+    "longitude": -122.084
+  },
+  "hasVideo": true,
+  "videoUri": "file:///data/user/0/.../video_176...",
+  "videoBase64": "AAAAGGZ0eXBtcDQy...",
+  "videoUrl": "/api/surveys/692eea74a61d2cb03946d3e0/video/download",
+  "timestamp": "2025-12-02T13:32:36.440262"
+}
+```
+
+**MongoDB 欄位說明：**
 | 欄位 | 類型 | 說明 |
 |------|------|------|
-| `id` | string | MongoDB 記錄 ID |
+| `_id` | ObjectId | MongoDB 記錄 ID |
 | `mood` | int | 心情分數 1-5 (Sentiment) |
 | `location` | object | GPS 座標 (latitude, longitude) |
 | `hasVideo` | bool | 是否有影片 |
+| `videoUri` | string | 手機本地影片路徑 |
+| `videoBase64` | string | 影片 Base64 編碼（用於下載） |
 | `videoUrl` | string | 影片下載網址（可直接下載 .mp4） |
 | `timestamp` | string | 記錄時間 (ISO 8601) |
 
